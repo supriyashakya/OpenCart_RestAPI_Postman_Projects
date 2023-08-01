@@ -1,0 +1,467 @@
+{
+	"info": {
+		"_postman_id": "9cbabfc7-7d62-461d-aae9-b407818c380b",
+		"name": "OnlineBOOKS_API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27812130"
+	},
+	"item": [
+		{
+			"name": "CREATE  Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function(){\r",
+							"    pm.response.to.have.status(201) ;  \r",
+							"});\r",
+							"\r",
+							"//capturing respose\r",
+							"var jsonData = pm.response.json();\r",
+							"\r",
+							"\r",
+							"\r",
+							"//Creating collection variable to store API TOKEN\r",
+							"pm.collectionVariables.set(\"book_bearer_token_collect\",jsonData.accessToken);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"console.log(\"pre-request script of randomly generate emailid & name\");\r",
+							"var random = Math.random().toString(36).substring(2);\r",
+							"var useremail = \"sup\"+random+\"@gmail.com\";\r",
+							"var username = \"sup\"+random;\r",
+							"pm.collectionVariables.set(\"email_collect\",useremail);\r",
+							"pm.collectionVariables.set(\"name_collect\",username);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"clientName\":  \"{{name_collect}}\",\r\n   \"clientEmail\": \"{{email_collect}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://simple-books-api.glitch.me/api-clients/",
+					"protocol": "https",
+					"host": [
+						"simple-books-api",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"api-clients",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Status of Books",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://simple-books-api.glitch.me/status",
+					"protocol": "https",
+					"host": [
+						"simple-books-api",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List of Books",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is ok\", function(){\r",
+							"    pm.response.to.have.status(200) ;  \r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://simple-books-api.glitch.me/books",
+					"protocol": "https",
+					"host": [
+						"simple-books-api",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"books"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a Single book details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is ok\", function(){\r",
+							"    pm.response.to.have.status(200) ;  \r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{book_bearer_token_collect}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://simple-books-api.glitch.me/books/3",
+					"protocol": "https",
+					"host": [
+						"simple-books-api",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"books",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit_order",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Status code Validation\r",
+							"/*pm.test(\"Status code is created\", function(){\r",
+							"    pm.response.to.have.status(201) ;  \r",
+							"});\r",
+							"*/\r",
+							"pm.test(`Status code is 201 - Actual Status Code: ${pm.response.code}`, () => {\r",
+							"    pm.response.to.have.status(201)\r",
+							"})\r",
+							"//extracting the responsebody and storing the ORDER_ID\r",
+							"var jsonData = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"orderid_env\", jsonData.orderId);\r",
+							"console.log(pm.environment.get(\"orderid_env\"));\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{book_bearer_token_collect}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "// {\r\n//   \"bookId\": \"{{BookID}}\",\r\n//   \"customerName\": \"{{CustomerName}}\"\r\n// }\r\n\r\n{\r\n  \"bookId\": \"3\",\r\n  \"customerName\":\"{{name_collect}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://simple-books-api.glitch.me/orders",
+					"protocol": "https",
+					"host": [
+						"simple-books-api",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Display all orders",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Status code Validation\r",
+							"pm.test(\"Status code is ok for displaying all orders\", function(){\r",
+							"    pm.response.to.have.status(200) ;  \r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{book_bearer_token_collect}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://simple-books-api.glitch.me/orders",
+					"protocol": "https",
+					"host": [
+						"simple-books-api",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Single Order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Status code Validation\r",
+							"pm.test(\"Status code is ok for displaying Single order\", function(){\r",
+							"    pm.response.to.have.status(200) ;  \r",
+							"});\r",
+							"\r",
+							"//Matching the value of previous request ORDER_ID with the present GET Display request ORDER_ID\r",
+							"pm.test(\"Check ORDER_ID present in the response body\", () =>\r",
+							"{\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData.id).to.be.eql(pm.environment.get(\"orderid_env\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{book_bearer_token_collect}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://simple-books-api.glitch.me/orders/{{orderid_env}}",
+					"protocol": "https",
+					"host": [
+						"simple-books-api",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"orders",
+						"{{orderid_env}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update an order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Status code Validation\r",
+							"pm.test(\"Status code is ok for Update an order\", function(){\r",
+							"    // pm.response.to.have.status(200) ;  \r",
+							"});\r",
+							"// console.log(pm.collectionVariables.get(\"customername_collect\"));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"console.log(pm.environment.get(\"orderid_env\"));\r",
+							"//geerating random string for custumer name\r",
+							"var random = Math.random().toString(36).substring(2);\r",
+							"var customername = \"johnny\"+random;\r",
+							"pm.collectionVariables.set(\"customername_collect\",customername);\r",
+							"console.log(pm.collectionVariables.get(\"customername_collect\"));\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{book_bearer_token_collect}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"customerName\": \"{{customername_collect}}\"\r\n}\r\n\r\n// {\r\n//   \"customerName\": \"John\"\r\n// }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://simple-books-api.glitch.me/orders/{{orderid_env}}",
+					"protocol": "https",
+					"host": [
+						"simple-books-api",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"orders",
+						"{{orderid_env}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Status code Validation\r",
+							"pm.test(\"Order is deleted succesfully\", function(){\r",
+							"    pm.response.to.have.status(204) ;  \r",
+							"});\r",
+							"\r",
+							"pm.environment.unset(\"orderid_env\");\r",
+							"pm.collectionVariables.unset(\"customername_collect\");\r",
+							"pm.collectionVariables.unset(\"book_bearer_token_collect\");\r",
+							"pm.collectionVariables.unset(\"name_collect\");\r",
+							"pm.collectionVariables.unset(\"email_collect\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{book_bearer_token_collect}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://simple-books-api.glitch.me/orders/{{orderid_env}}",
+					"protocol": "https",
+					"host": [
+						"simple-books-api",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"orders",
+						"{{orderid_env}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
